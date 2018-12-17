@@ -1,0 +1,615 @@
+From: Marius Genheimer <mail@f0wl.cc>
+Date: Mon, 10 Dec 2018 21:54:55 +0100
+Subject: ipq40xx: add support for ASUS Lyra
+
+SoC:   Qualcomm IPQ4019 (Dakota) 717 MHz, 4 cores
+RAM:   256 MiB (Nanya NT5CC128M16IP-DI)
+FLASH: 128 MiB (Macronix NAND)
+WiFi0: Qualcomm IPQ4019 b/g/n 2x2
+WiFi1: Qualcomm IPQ4019 a/n/ac 2x2
+WiFi2: Qualcomm Atheros QCA9886 a/n/ac
+BT:    Atheros AR3012
+IN:    WPS Button, Reset Button
+OUT:   RGB-LED via TI LP5523 9-channel Controller
+UART:  Front of Device - 115200 N-8
+       Pinout 3.3v - RX - TX - GND (Square is VCC)
+
+Installation:
+1. Transfer OpenWRT-initrams image to the device via SSH to /tmp.
+Login credentials are identical to the Web UI.
+
+2. Login to the device via SSH.
+
+3. Flash the initramfs image using
+
+> mtd-write -d linux -i openwrt-image-file
+
+4. Power-cycle the device and wait for OpenWRT to boot.
+
+5. From there flash the OpenWRT-sysupgrade image.
+
+Signed-off-by: Marius Genheimer <mail@f0wl.cc>
+
+diff --git a/package/firmware/ipq-wifi/Makefile b/package/firmware/ipq-wifi/Makefile
+index b1428f173ddb507f0c92313dcca7aae57284a0b8..25db0901bda4299e0d12816ddfad94f2c2fcd112 100644
+--- a/package/firmware/ipq-wifi/Makefile
++++ b/package/firmware/ipq-wifi/Makefile
+@@ -52,4 +52,6 @@ $(eval $(call generate-ipq-wifi-package,zyxel_wre6606,board-zyxel_wre6606.bin,Zy
+ #$(eval $(call generate-ipq-wifi-package,<devicename>,<filename>,<displayname>))
+ $(eval $(call generate-ipq-wifi-package,zyxel_nbg6617,board-zyxel_nbg6617.bin,ZyXEL NBG6617))
+ 
++$(eval $(call generate-ipq-wifi-package,map-ac2200,map-ac2200.bin,ASUS MAP-AC2200))
++
+ $(foreach PACKAGE,$(ALLWIFIPACKAGES),$(eval $(call BuildPackage,$(PACKAGE))))
+diff --git a/package/firmware/ipq-wifi/board-2.bin b/package/firmware/ipq-wifi/board-2.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..372936010a4723ee0197dc56cbfd3a193e559552
+GIT binary patch
+literal 24324
+zcmeHPeNa<Z7QYE#tWxELfC%^qNq|HlK%h01SOTP!kBAlp4Z0MlwImk#5)eaI+EGj~
+zMZ}MS5Jbx;U#65YuCyvvY`5J}rn|E<?O(RDAG0&<F578$x1HHp-1GAC2!WspM8WXR
+z^S*oTx%b?A?(f}%_ul=Pmy!}961Js8N2Nz3ZcfNlprWE81X2=7oDtdxsi2~KV}4;l
+zctMdm;*~;mNrZa$#wb&%pg6y5H&K*Cg;(a6sq^>k-<Ys9Yiq=&ge?&XNfJp^6!gb{
+zKDf{yH?o<{U?8_c?AUCg@3kF>f$|Vq#_}SHh=UL>2J)qF*b<Q_hUf~Rn3$M<{rDr2
+zah9N8{(L;1N^a1>Y=ny#pH1~^Bu7H`L7>iDn%Zh=dF6z`3y}w9AY!C+OCE1C;w!|6
+z4#_g)hDOlH9Z#fVlE+kc4tui2_PEy_7?-$Wlan`;i4<r~kU1pFm#<jikb{lJJR7$8
+zFqJg)5zEFb))Cz6x?EqcQK#m_-@DwZtKOZHp8DL4p4OxFW$KqwpS{rwTDdwi^_gEl
+z2Cj(0&{)sqBlUaLn{wp$dRyzN3v-mIvK!q*vz*jaDL5RfuL4^f=@7OSjdfnGsos&Z
+zAvGLa4_CjEqkv`?TkF9!T`IhBxwWafBqviEWp)U&j_)C*YLJICv96{atnsj2as`xZ
+z&+N&v-tO4@Mw%vSyKj77d%14??vO11^y@vPEy+iPWqx@ry*pc;JIXEh&L3)1*QD>|
+zZ}OE7T_~=LD-@{$l%I81zq|RUxO~kkAN5wXY&sTE6}abidr3|5tGrb24I`b!htrBf
+zvwRhoE~=YT>ep2T6b@akJQsN=sKh(($wG;amO{XT_0;mGS7P2it5yfB38KF7EjjTW
+zYZ1!JDu){)xV>O7nM?+8c60Oa@K|CN*4JH)2l76DYm1O05b)t&2roF8&kN@9vfY>3
+zdrx9D8eNzZ0*#H8mD{!{lci|+@+C{iuB4(6K93g!1rF;!zl@LjfJWK~;~GyE)7|}l
+zrlt&J%b)D!(Va{B;C=+UFFDlEM<ik-p;<x&gz&g)d_x619v2Vv_XBPAHt^*0`9w$1
+ztGU0q*leMK;TV>HCt%TdG*(h^@X+D68%|!Jl;#NqMaPmdFrmoIa_s>M8)u8zci5Oe
+z?l1ONdf{G}AD)OOiWBc7Vrh7qI87<X<yZ<X!6jnJ9SODp-yq(gjKZTZDLyf_!4i*^
+ziUbl$-g^uxHBFgpV#Y3`dgI<>-dF%0AP!I_;YnjjSUR3APFKd@F=H`U93Cf*Q<|=a
+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
+OaX<L%gsHhU@BaT@Hv2IE
+
+literal 0
+HcmV?d00001
+
+diff --git a/package/firmware/ipq-wifi/map-ac2200.bin b/package/firmware/ipq-wifi/map-ac2200.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..372936010a4723ee0197dc56cbfd3a193e559552
+GIT binary patch
+literal 24324
+zcmeHPeNa<Z7QYE#tWxELfC%^qNq|HlK%h01SOTP!kBAlp4Z0MlwImk#5)eaI+EGj~
+zMZ}MS5Jbx;U#65YuCyvvY`5J}rn|E<?O(RDAG0&<F578$x1HHp-1GAC2!WspM8WXR
+z^S*oTx%b?A?(f}%_ul=Pmy!}961Js8N2Nz3ZcfNlprWE81X2=7oDtdxsi2~KV}4;l
+zctMdm;*~;mNrZa$#wb&%pg6y5H&K*Cg;(a6sq^>k-<Ys9Yiq=&ge?&XNfJp^6!gb{
+zKDf{yH?o<{U?8_c?AUCg@3kF>f$|Vq#_}SHh=UL>2J)qF*b<Q_hUf~Rn3$M<{rDr2
+zah9N8{(L;1N^a1>Y=ny#pH1~^Bu7H`L7>iDn%Zh=dF6z`3y}w9AY!C+OCE1C;w!|6
+z4#_g)hDOlH9Z#fVlE+kc4tui2_PEy_7?-$Wlan`;i4<r~kU1pFm#<jikb{lJJR7$8
+zFqJg)5zEFb))Cz6x?EqcQK#m_-@DwZtKOZHp8DL4p4OxFW$KqwpS{rwTDdwi^_gEl
+z2Cj(0&{)sqBlUaLn{wp$dRyzN3v-mIvK!q*vz*jaDL5RfuL4^f=@7OSjdfnGsos&Z
+zAvGLa4_CjEqkv`?TkF9!T`IhBxwWafBqviEWp)U&j_)C*YLJICv96{atnsj2as`xZ
+z&+N&v-tO4@Mw%vSyKj77d%14??vO11^y@vPEy+iPWqx@ry*pc;JIXEh&L3)1*QD>|
+zZ}OE7T_~=LD-@{$l%I81zq|RUxO~kkAN5wXY&sTE6}abidr3|5tGrb24I`b!htrBf
+zvwRhoE~=YT>ep2T6b@akJQsN=sKh(($wG;amO{XT_0;mGS7P2it5yfB38KF7EjjTW
+zYZ1!JDu){)xV>O7nM?+8c60Oa@K|CN*4JH)2l76DYm1O05b)t&2roF8&kN@9vfY>3
+zdrx9D8eNzZ0*#H8mD{!{lci|+@+C{iuB4(6K93g!1rF;!zl@LjfJWK~;~GyE)7|}l
+zrlt&J%b)D!(Va{B;C=+UFFDlEM<ik-p;<x&gz&g)d_x619v2Vv_XBPAHt^*0`9w$1
+ztGU0q*leMK;TV>HCt%TdG*(h^@X+D68%|!Jl;#NqMaPmdFrmoIa_s>M8)u8zci5Oe
+z?l1ONdf{G}AD)OOiWBc7Vrh7qI87<X<yZ<X!6jnJ9SODp-yq(gjKZTZDLyf_!4i*^
+ziUbl$-g^uxHBFgpV#Y3`dgI<>-dF%0AP!I_;YnjjSUR3APFKd@F=H`U93Cf*Q<|=a
+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
+OaX<L%gsHhU@BaT@Hv2IE
+
+literal 0
+HcmV?d00001
+
+diff --git a/target/linux/ipq40xx/base-files/etc/board.d/02_network b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+index 5c90ef136fd7cbbe023001030d8c9003347bd249..c603759ae4f3aa164147d6be83d3f40f57e28861 100755
+--- a/target/linux/ipq40xx/base-files/etc/board.d/02_network
++++ b/target/linux/ipq40xx/base-files/etc/board.d/02_network
+@@ -15,6 +15,14 @@ case "$board" in
+ 8dev,jalapeno)
+ 	ucidef_set_interfaces_lan_wan "eth0" "eth1"
+ 	;;
++asus,map-ac2200)
++	ucidef_set_interfaces_lan_wan "eth1" "eth0"
++	mac_addr=$(mtd_get_mac_binary_ubi Factory 4102)
++	lan_mac_addr=$(macaddr_add "$mac_addr" 3)
++	wan_mac_addr=$(macaddr_add "$mac_addr" 1)
++	ucidef_set_interface_macaddr "lan" "$lan_mac_addr"
++	ucidef_set_interface_macaddr "wan" "$wan_mac_addr"
++	;;
+ asus,rt-ac58u)
+ 	CI_UBIPART=UBI_DEV
+ 	wan_mac_addr=$(mtd_get_mac_binary_ubi Factory 20486)
+diff --git a/target/linux/ipq40xx/base-files/etc/hotplug.d/firmware/11-ath10k-caldata b/target/linux/ipq40xx/base-files/etc/hotplug.d/firmware/11-ath10k-caldata
+index 1d4fd9cd8f9a3983ac3323ce72153c1dcc17a69a..57d7a91905ee52a875c3c192b50baf75c9d7cefa 100644
+--- a/target/linux/ipq40xx/base-files/etc/hotplug.d/firmware/11-ath10k-caldata
++++ b/target/linux/ipq40xx/base-files/etc/hotplug.d/firmware/11-ath10k-caldata
+@@ -112,6 +112,9 @@ case "$FIRMWARE" in
+ 	;;
+ "ath10k/pre-cal-pci-0000:01:00.0.bin")
+ 	case "$board" in
++	asus,map-ac2200)
++		ath10kcal_ubi_extract "Factory" 36864 12064
++		;;
+ 	openmesh,a62)
+ 		ath10kcal_extract "0:ART" 36864 12064
+ 		;;
+@@ -124,6 +127,9 @@ case "$FIRMWARE" in
+ 	qcom,ap-dk01.1-c1)
+ 		ath10kcal_extract "ART" 4096 12064
+ 		;;
++	asus,map-ac2200)
++		ath10kcal_ubi_extract "Factory" 4096 12064
++		;;
+ 	asus,rt-ac58u)
+ 		CI_UBIPART=UBI_DEV
+ 		ath10kcal_ubi_extract "Factory" 4096 12064
+@@ -160,6 +166,9 @@ case "$FIRMWARE" in
+ 	qcom,ap-dk01.1-c1)
+ 		ath10kcal_extract "ART" 20480 12064
+ 		;;
++	asus,map-ac2200)
++		ath10kcal_ubi_extract "Factory" 20480 12064
++		;;
+ 	asus,rt-ac58u)
+ 		CI_UBIPART=UBI_DEV
+ 		ath10kcal_ubi_extract "Factory" 20480 12064
+diff --git a/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh b/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
+index 0e29302465fb5fca6f2a2194c751728f492053d5..b469e2593f6472bea7bd8a0f1e4cd02a326c405f 100644
+--- a/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ipq40xx/base-files/lib/upgrade/platform.sh
+@@ -49,6 +49,10 @@ platform_do_upgrade() {
+ 	8dev,jalapeno)
+ 		nand_do_upgrade "$ARGV"
+ 		;;
++	asus,map-ac2200)
++		CI_KERNPART="linux"
++		nand_do_upgrade "$1"
++		;;
+ 	asus,rt-ac58u)
+ 		CI_UBIPART="UBI_DEV"
+ 		CI_KERNPART="linux"
+diff --git a/target/linux/ipq40xx/config-4.14 b/target/linux/ipq40xx/config-4.14
+index a9c1e6a92d1e2ac4b3a42bff0f6e3845a2e72dd1..7c233e39c102582e939b6f9f9befc7af9ff6df0a 100644
+--- a/target/linux/ipq40xx/config-4.14
++++ b/target/linux/ipq40xx/config-4.14
+@@ -265,6 +265,7 @@ CONFIG_IRQ_DOMAIN=y
+ CONFIG_IRQ_DOMAIN_HIERARCHY=y
+ CONFIG_IRQ_FORCED_THREADING=y
+ CONFIG_IRQ_WORK=y
++CONFIG_LEDS_LP5523=y
+ CONFIG_LEDS_LP5562=y
+ CONFIG_LEDS_LP55XX_COMMON=y
+ CONFIG_LIBFDT=y
+diff --git a/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4019-map-ac2200.dts b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4019-map-ac2200.dts
+new file mode 100644
+index 0000000000000000000000000000000000000000..05d7226a92ed808db3f8081e4ca74abe22e1dcad
+--- /dev/null
++++ b/target/linux/ipq40xx/files-4.14/arch/arm/boot/dts/qcom-ipq4019-map-ac2200.dts
+@@ -0,0 +1,311 @@
++/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
++ *
++ * Permission to use, copy, modify, and/or distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ *
++ */
++
++#include "qcom-ipq4019.dtsi"
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++#include <dt-bindings/soc/qcom,tcsr.h>
++
++/ {
++	model = "ASUS Lyra MAP-AC2200";
++	compatible = "asus,map-ac2200", "qcom,ipq4019";
++
++	aliases {
++		led-boot = &led_blue0;
++		led-failsafe = &led_red0;
++		led-running = &led_blue0;
++		led-upgrade = &led_red0;
++	};
++
++	soc {
++		mdio@90000 {
++			status = "okay";
++		};
++
++		ess-psgmii@98000 {
++			status = "okay";
++		};
++
++		tcsr@1949000 {
++			compatible = "qcom,tcsr";
++			reg = <0x1949000 0x100>;
++			qcom,wifi_glb_cfg = <TCSR_WIFI_GLB_CFG>;
++		};
++
++		ess_tcsr@1953000 {
++			compatible = "qcom,tcsr";
++			reg = <0x1953000 0x1000>;
++			qcom,ess-interface-select = <TCSR_ESS_PSGMII>;
++		};
++
++		tcsr@1957000 {
++			compatible = "qcom,tcsr";
++			reg = <0x1957000 0x100>;
++			qcom,wifi_noc_memtype_m0_m2 = <TCSR_WIFI_NOC_MEMTYPE_M0_M2>;
++		};
++
++		usb2@60f8800 {
++			status = "okay";
++		};
++
++		serial@78af000 {
++			pinctrl-0 = <&serial_pins>;
++			pinctrl-names = "default";
++			status = "okay";
++		};
++
++		crypto@8e3a000 {
++			status = "okay";
++		};
++
++		watchdog@b017000 {
++			status = "okay";
++		};
++
++		ess-switch@c000000 {
++			status = "okay";
++		};
++
++		edma@c080000 {
++			status = "okay";
++		};
++	};
++
++	gpio-keys {
++		compatible = "gpio-keys";
++		reset {
++			label = "reset";
++			gpios = <&tlmm 34 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_RESTART>;
++		};
++
++		wps {
++			label = "wps";
++			gpios = <&tlmm 18 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_WPS_BUTTON>;
++		};
++	};
++};
++
++&nand {
++	pinctrl-0 = <&nand_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++
++	nand@0 {
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "SBL1";
++				reg = <0x0 0x80000>;
++				read-only;
++			};
++
++			partition@80000 {
++				label = "MIBIB";
++				reg = <0x80000 0x80000>;
++				read-only;
++			};
++
++			partition@100000 {
++				label = "QSEE";
++				reg = <0x100000 0x100000>;
++				read-only;
++			};
++
++			partition@200000 {
++				label = "CDT";
++				reg = <0x200000 0x80000>;
++				read-only;
++			};
++
++			partition@280000 {
++				label = "APPSBL";
++				reg = <0x280000 0x140000>;
++				read-only;
++			};
++
++			partition@3c0000 {
++				label = "APPSBLENV";
++				reg = <0x3c0000 0x40000>;
++				read-only;
++			};
++
++			partition@400000 {
++				label = "ubi";
++				reg = <0x400000 0x7c00000>;
++			};
++		};
++	};
++};
++
++&tlmm {
++	i2c_0_pins: i2c_0_pinmux {
++		pinmux {
++			function = "blsp_i2c0";
++			pins = "gpio20", "gpio21";
++		};
++
++		pinconf {
++			pins = "gpio20", "gpio21";
++			drive-strength = <16>;
++			bias-disable;
++		};
++	};
++
++	serial_pins: serial_pinmux {
++		mux {
++			pins = "gpio16", "gpio17";
++			function = "blsp_uart0";
++			bias-disable;
++		};
++	};
++
++	nand_pins: nand_pins {
++		pullups {
++			pins = "gpio52", "gpio53", "gpio58",
++				"gpio59";
++			function = "qpic";
++			bias-pull-up;
++		};
++
++		pulldowns {
++			pins = "gpio54", "gpio55", "gpio56",
++				"gpio57", "gpio60", "gpio61",
++				"gpio62", "gpio63", "gpio64",
++				"gpio65", "gpio66", "gpio67",
++				"gpio68", "gpio69";
++			function = "qpic";
++			bias-pull-down;
++		};
++	};
++};
++
++&cryptobam {
++	status = "okay";
++};
++
++&blsp_dma {
++	status = "okay";
++};
++
++&qpic_bam {
++	status = "okay";
++};
++
++&wifi0{
++	status = "okay";
++	qcom,ath10k-calibration-variant = "ASUS-MAP-AC2200";
++};
++
++&wifi1{
++	status = "okay";
++	qcom,ath10k-calibration-variant = "ASUS-MAP-AC2200";
++};
++
++&pcie0 {
++	status = "okay";
++	perst-gpio = <&tlmm 38 GPIO_ACTIVE_LOW>;
++	wake-gpio = <&tlmm 50 GPIO_ACTIVE_LOW>;
++
++	bridge@0,0 {
++		reg = <0x00000000 0 0 0 0>;
++		#address-cells = <3>;
++		#size-cells = <2>;
++		ranges;
++
++		wifi2: wifi@0,0 {
++			compatible = "qcom,ath10k";
++			status = "okay";
++			reg = <0x00010000 0 0 0 0>;
++		};
++	};
++};
++
++&usb2_hs_phy {
++	/* Bluetooth module attached via USB */
++	status = "okay";
++};
++
++&blsp1_i2c3 {
++	pinctrl-0 = <&i2c_0_pins>;
++	pinctrl-names = "default";
++	status = "okay";
++
++	lp55231@32 {
++		/* 9-channel RGB LED controller */
++		compatible = "national,lp5523";
++		reg = <0x32>;
++		clock-mode = [01];
++
++		led_blue0: blue0 {
++			chan-name = "blue0";
++			led-cur = [fa];
++			max-cur = [ff];
++		};
++
++		blue1 {
++			chan-name = "blue1";
++			led-cur = [fa];
++			max-cur = [ff];
++		};
++
++		blue2 {
++			chan-name = "blue2";
++			led-cur = [fa];
++			max-cur = [ff];
++		};
++
++		green0 {
++			chan-name = "green0";
++			led-cur = [fa];
++			max-cur = [ff];
++		};
++
++		green1 {
++			chan-name = "green1";
++			led-cur = [fa];
++			max-cur = [ff];
++		};
++
++		green2 {
++			chan-name = "green2";
++			led-cur = [fa];
++			max-cur = [ff];
++		};
++
++		led_red0: red0 {
++			chan-name = "red0";
++			led-cur = [fa];
++			max-cur = [ff];
++		};
++
++		red1 {
++			chan-name = "red1";
++			led-cur = [fa];
++			max-cur = [ff];
++		};
++
++		red2 {
++			chan-name = "red2";
++			led-cur = [fa];
++			max-cur = [ff];
++		};
++	};
++};
+diff --git a/target/linux/ipq40xx/image/Makefile b/target/linux/ipq40xx/image/Makefile
+index 5cd11cae237b4658906652967d8120bd0dc080a8..77b09d15ace786aac73b60cd97af1415f0a5bfc4 100644
+--- a/target/linux/ipq40xx/image/Makefile
++++ b/target/linux/ipq40xx/image/Makefile
+@@ -56,6 +56,17 @@ define Device/8dev_jalapeno
+ endef
+ TARGET_DEVICES += 8dev_jalapeno
+ 
++define Device/asus_map-ac2200
++	$(call Device/FitImageLzma)
++	DEVICE_DTS := qcom-ipq4019-map-ac2200
++	BLOCKSIZE := 126976
++	PAGESIZE := 2048
++	DEVICE_TITLE := ASUS Lyra MAP-AC2200
++	IMAGES := sysupgrade.bin
++	DEVICE_PACKAGES := ipq-wifi-map-ac2200 ath10k-firmware-qca9888 kmod-ath3k
++endef
++TARGET_DEVICES += asus_map-ac2200
++
+ define Device/asus_rt-ac58u
+ 	$(call Device/FitImageLzma)
+ 	DEVICE_DTS := qcom-ipq4018-rt-ac58u
+diff --git a/target/linux/ipq40xx/patches-4.14/069-arm-boot-add-dts-files.patch b/target/linux/ipq40xx/patches-4.14/069-arm-boot-add-dts-files.patch
+index 8066f986a4e030c9c8fe0ec4438e92d30daa77f0..5d1d700250c5cfdbae01ee6fd02c7db187fa1648 100644
+--- a/target/linux/ipq40xx/patches-4.14/069-arm-boot-add-dts-files.patch
++++ b/target/linux/ipq40xx/patches-4.14/069-arm-boot-add-dts-files.patch
+@@ -10,7 +10,7 @@ Signed-off-by: John Crispin <john@phrozen.org>
+ 
+ --- a/arch/arm/boot/dts/Makefile
+ +++ b/arch/arm/boot/dts/Makefile
+-@@ -697,7 +697,20 @@ dtb-$(CONFIG_ARCH_QCOM) += \
++@@ -697,7 +697,21 @@ dtb-$(CONFIG_ARCH_QCOM) += \
+  	qcom-apq8074-dragonboard.dtb \
+  	qcom-apq8084-ifc6540.dtb \
+  	qcom-apq8084-mtp.dtb \
+@@ -25,6 +25,7 @@ Signed-off-by: John Crispin <john@phrozen.org>
+  	qcom-ipq4019-ap.dk01.1-c1.dtb \
+ +	qcom-ipq4019-a62.dtb \
+ +	qcom-ipq4019-ap.dk04.1-c1.dtb \
+++	qcom-ipq4019-map-ac2200.dtb \
+ +	qcom-ipq4028-wpj428.dtb \
+ +	qcom-ipq4029-gl-b1300.dtb \
+ +	qcom-ipq4029-mr33.dtb \

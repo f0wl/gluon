@@ -6,6 +6,13 @@ if [ "$GLUON_WLAN_MESH" = 'ibss' ]; then
 fi
 
 
+# ASUS
+
+device asus-map-ac2200 asus_map-ac2200
+factory
+packages $ATH10K_PACKAGES_IPQ40XX $ATH10K_PACKAGES_QCA9888
+
+
 # AVM
 
 device avm-fritz-box-4040 avm_fritzbox-4040
