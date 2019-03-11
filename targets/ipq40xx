@@ -1,4 +1,4 @@
-ATH10K_PACKAGES_IPQ40XX=
+ATH10K_PACKAGES_IPQ40XX='-kmod-ath10k-ct kmod-ath10k -ath10k-firmware-qca4019-ct ath10k-firmware-qca4019'
 ATH10K_PACKAGES_QCA9888='ath10k-firmware-qca9888 -ath10k-firmware-qca9888-ct'
 if [ "$GLUON_WLAN_MESH" = 'ibss' ]; then
 	ATH10K_PACKAGES_IPQ40XX='-kmod-ath10k kmod-ath10k-ct -ath10k-firmware-qca4019 ath10k-firmware-qca4019-ct'
@@ -13,6 +13,11 @@ factory
 extra_image -squashfs-eva -bootloader .bin
 packages $ATH10K_PACKAGES_IPQ40XX
 
+#Asus
+
+device asus-map_ac2200 asus_map-ac2200
+factory
+packages $ATH10K_PACKAGES_IPQ40XX $ATH10K_PACKAGES_QCA9888
 
 # GL.iNet
 
